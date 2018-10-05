@@ -1,3 +1,21 @@
+Skip to content
+
+Search or jump to…
+
+Pull requests
+Issues
+Marketplace
+Explore
+ @TiboLouagie Sign out
+0
+0 1 TiboLouagie/create3-labo2
+forked from simoncoudeville-nmct/create3-labo2
+ Code  Pull requests 0  Projects 0  Wiki  Insights  Settings
+create3-labo2/css/screen.css
+84109a1  2 days ago
+@simoncoudeville simoncoudeville Moved some components around
+
+1401 lines (1165 sloc)  25.3 KB
 /*------------------------------------*\
 #FONTS
 \*------------------------------------*/
@@ -47,12 +65,14 @@
     /* Shadows */
     --shadow-color: #20223a15;
     --inset-shadow: inset 0 1px 1px var(--shadow-color);
+    --focus-shadow-color: #3385FF30;
+    --focus-shadow: 0 0 0 3px var(--focus-shadow-color);
 
     /* border radius */
     --radius: 3px;
 
     /* transitions */
-    --transition-alpha: .1s ease-out;
+    --transition-alpha: .1s ease-in-out;
 }
 
 /*------------------------------------*\
@@ -222,6 +242,10 @@ a:focus {
 label,
 input {
     display: block;
+}
+
+select {
+    width: 100%;
 }
 
 input::placeholder {
@@ -616,8 +640,8 @@ input::placeholder {
     width: 100%;
     border: 1px solid var(--color-neutral-xxx-light);
     border-radius: var(--radius);
-    color: var(--color-neutral-xxxx-dark);
     background-color: #fff;
+    color: var(--color-neutral-xxxx-dark);
     font-family: inherit;
     font-size: 16px;
     line-height: 24px;
@@ -634,7 +658,16 @@ input::placeholder {
 .c-input:focus,
 .c-input:active {
     border-color: var(--color-alpha-x-light);
-    box-shadow: 0 0 0 3px var(--color-alpha-xx-light);
+    box-shadow: var(--focus-shadow);
+}
+
+/*
+Input password with toggle checkbox on top of it needs
+more padding on the right to avoid overlap
+*/
+
+.c-input--password-with-toggle {
+    padding-right: 52px;
 }
 
 /* option input for checkboxes and radio buttons */
@@ -659,6 +692,7 @@ input::placeholder {
 
 .c-label--option {
     padding-bottom: 0;
+    margin-left: 8px;
 }
 
 /*
@@ -687,7 +721,7 @@ input::placeholder {
 
 .c-button:focus {
     background-color: var(--color-alpha);
-    box-shadow: 0 0 0 3px var(--color-alpha-xx-light);
+    box-shadow: var(--focus-shadow);
 }
 
 .c-button:active {
@@ -698,39 +732,288 @@ input::placeholder {
 /*
     Component: Option list
     ---
-
 */
 
 .c-option-list {
-
+    margin-bottom: 24px;
 }
 
 .c-option-list__item {
-
+    margin-bottom: 12px;
 }
 
 /*
-    Component: Custom options
+    Custom option
     ---
     Custom checkboxes & radio buttons
 */
 
 /* Hide the actual input with the class .o-hide-accessible */
 
-/* checked state */
-
-.c-custom-input-option-hidden:checked + .c-custom-input-option-label {
-    /*
-        Do magic stuff here, for example:
-        background-color: red;
-    */
+/* the label is a separate component */
+.c-custom-input-option-label {
+    display: -webkit-flex;
+    display: -ms-flex;
+    display: flex;
+    -ms-align-items: center;
+    align-items: center;
+    padding-bottom: 0;
 }
 
+.c-custom-input-option {
+    display: flex;
+    -ms-align-items: center;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
+    margin-right: 8px;
+    border: 1px solid var(--color-neutral-xxx-light);
+    box-shadow: var(--inset-shadow);
+    transition: border var(--transition-alpha);
+}
+
+.c-custom-input-option--checkbox {
+    border-radius: var(--radius);
+}
+
+.c-custom-input-option--radio {
+    border-radius: 100%;
+}
+
+.c-custom-input-option__symbol {
+    display: block;
+    opacity: 0; /* Hide the svg initially */
+    transform: scale(.5);
+    transition: all var(--transition-alpha);
+}
+
+.c-custom-input-option--checkbox .c-custom-input-option__symbol {
+    width: 10px;
+    height: 10px;
+    fill: var(--color-alpha);
+}
+
+.c-custom-input-option--radio .c-custom-input-option__symbol {
+    background-color: var(--color-alpha);
+    border-radius: 100%;
+    width: 6px;
+    height: 6px;
+}
+
+/* hover state */
+
+.c-custom-input-option-label:hover .c-custom-input-option {
+    border-color: var(--color-neutral-xx-light);
+}
+
+/* focused and active state */
+
+.c-custom-input-option-hidden:focus + .c-custom-input-option-label .c-custom-input-option {
+    border: 1px solid var(--color-alpha-x-light);
+    box-shadow: var(--focus-shadow);
+}
+
+/* checked state */
+
 .c-custom-input-option-hidden:checked + .c-custom-input-option-label .c-custom-input-option__symbol {
-    /*
-        Do magic stuff here, for example:
-        fill: blue;
-    */
+    opacity: 1; /* Show the svg when the invisible checkbox is checked */
+    transform: scale(1);
+}
+
+/*
+    Component: Custom Toggle
+    ---
+    Visually change a checkbox into a toggle
+*/
+
+.c-toggle-list {
+    margin-bottom: 24px;
+}
+
+.c-toggle-list__item {
+    margin-bottom: 12px;
+}
+
+.c-toggle-list__item + .c-toggle-list__item {
+    padding-top: 12px;
+    border-top: 1px solid var(--color-neutral-xxx-light);
+}
+
+.c-toggle__label {
+    display: -webkit-flex;
+    display: -ms-flex;
+    display: flex;
+    -ms-align-items: center;
+    align-items: center;
+    padding-bottom: 0;
+}
+
+.c-toggle__label--inverted {
+    -webkit-flex-direction: row-reverse;
+    -ms-flex-direction: row-reverse;
+    flex-direction: row-reverse;
+    justify-content: space-between;
+}
+
+.c-toggle__input {
+    display: block;
+    height: 24px;
+    width: 48px;
+    margin-right: 16px;
+    background-color: var(--color-neutral-xxxx-light);
+    border-radius: 32px;
+    border: 1px solid var(--color-neutral-xxx-light);
+    transition: all var(--transition-alpha);
+}
+
+.c-toggle__label--inverted .c-toggle__input {
+    margin-right: 0;
+}
+
+.c-toggle__input::after {
+    display: block;
+    content: '';
+    height: 22px;
+    width: 22px;
+    border-radius: 100%;
+    box-shadow: 0 1px 3px 1px rgba(0,0,0,.2);
+    background-color: #fff;
+    /* background-image: linear-gradient(to bottom, #fff, var(--color-neutral-xxxx-light)); */
+    transition: all var(--transition-alpha);
+}
+
+/* focused and active state */
+
+.c-toggle__checkbox-hidden:focus + .c-toggle__label .c-toggle__input,
+.c-toggle__checkbox-hidden:active + .c-toggle__label .c-toggle__input {
+    border-color: var(--color-alpha-x-light);
+    box-shadow: var(--focus-shadow);
+}
+
+/* checked state */
+
+.c-toggle__checkbox-hidden:checked + .c-toggle__label .c-toggle__input::after {
+    transform: translate(24px,0);
+}
+
+.c-toggle__checkbox-hidden:checked + .c-toggle__label .c-toggle__input {
+    background-color: var(--color-alpha);
+    border-color: var(--color-alpha-dark);
+}
+
+/* alternative design */
+
+.c-toggle__input--alternative {
+    height: 20px;
+    width: 40px;
+    background-color: var(--color-neutral-xxx-light);
+    border-color: white;
+}
+
+.c-toggle__input--alternative::after {
+    transform: translate(-2px,-2px);
+    border: 1px solid white;
+}
+
+/* focused and active state */
+
+.c-toggle__checkbox-hidden:focus + .c-toggle__label .c-toggle__input--alternative,
+.c-toggle__checkbox-hidden:active + .c-toggle__label .c-toggle__input--alternative {
+    border-color: white;
+    box-shadow: none;
+}
+
+.c-toggle__checkbox-hidden:focus + .c-toggle__label .c-toggle__input--alternative::after,
+.c-toggle__checkbox-hidden:active + .c-toggle__label .c-toggle__input--alternative::after {
+    border-color: var(--color-alpha-x-light);
+    box-shadow: 0 1px 3px 1px rgba(0,0,0,.2), 0 0 0 3px var(--focus-shadow-color);
+}
+
+/* checked state */
+
+.c-toggle__checkbox-hidden:checked + .c-toggle__label .c-toggle__input--alternative::after {
+    transform: translate(18px,-2px);
+    background-color: var(--color-alpha);
+    border-color: var(--color-alpha);
+}
+
+.c-toggle__checkbox-hidden:focus:checked + .c-toggle__label .c-toggle__input--alternative::after,
+.c-toggle__checkbox-hidden:active:checked + .c-toggle__label .c-toggle__input--alternative::after {
+    border-color: var(--color-alpha-dark);
+}
+
+.c-toggle__checkbox-hidden:checked + .c-toggle__label .c-toggle__input--alternative {
+    background-color: var(--color-alpha-xx-light);
+    border-color: white;
+}
+
+/*
+    Component: Custom Select
+    ---
+    Custom select dropdown
+*/
+
+
+.c-custom-select {
+    display: block;
+    position: relative;
+}
+
+.c-custom-select__symbol {
+    width: 24px;
+    height: 24px;
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    pointer-events: none;
+    fill: var(--color-neutral-x-light);
+}
+
+/*
+    Component: Password Toggle
+    ---
+    Password toggle custom checkbox
+*/
+
+.c-password-toggle-container {
+    position: relative;
+    display: block;
+}
+
+.c-password-toggle {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+}
+
+.c-password-toggle__label {
+    display: -webkit-flex;
+    display: -ms-flex;
+    display: flex;
+    -ms-align-items: center;
+    align-items: center;
+    padding: 14px 16px;
+}
+
+.c-password-toggle__symbol {
+    display: block;
+    width: 20px;
+    height: 20px;
+    fill: var(--color-neutral-x-light);
+}
+
+.c-password-toggle__symbol--hide {
+    display: none;
+}
+
+.c-password-toggle__checkbox:checked + .c-password-toggle__label .c-password-toggle__symbol--hide {
+    display: block;
+}
+
+.c-password-toggle__checkbox:checked + .c-password-toggle__label .c-password-toggle__symbol--show {
+    display: none;
 }
 
 /*------------------------------------*\
@@ -1132,3 +1415,16 @@ No media query since this is the default in mobile first design
         page-break-after: avoid;
     }
 }
+© 2018 GitHub, Inc.
+Terms
+Privacy
+Security
+Status
+Help
+Contact GitHub
+Pricing
+API
+Training
+Blog
+About
+Press h to open a hovercard with more details.
